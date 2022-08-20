@@ -82,24 +82,28 @@ export default class AppClass extends React.Component {
     const point = direction.target.id
     
     if (point === 'left') {
-      this.state.index > 0?
-      this.setState({ ...this.state, index: this.state.index -1, steps: this.state.steps +1, cords: grid[this.state.index -1] }, this.getY) :
-       null;
+      this.state.index > 0 && this.state.index !== 3 && this.state.index !== 6?
+      this.setState({ ...this.state, index: this.state.index -1, steps: this.state.steps +1, cords: grid[this.state.index -1], message: '' }, 
+      this.getY) :
+      this.setState({ ...this.state, message: `You can't go left`})
     }
     if (point === 'right') {
-      this.state.index < 8?
-      this.setState({ ...this.state, index: this.state.index +1, steps: this.state.steps +1, cords: grid[this.state.index +1 ] }, this.getY) :
-      null;
+      this.state.index < 8 && this.state.index !== 2 && this.state.index !== 5?
+      this.setState({ ...this.state, index: this.state.index +1, steps: this.state.steps +1, cords: grid[this.state.index +1 ], message: '' }, 
+      this.getY) :
+      this.setState({ ...this.state, message: `You can't go right`});
     }    
     if (point === 'up') {
       this.state.index >= 3?
-      this.setState({ ...this.state, index: this.state.index -3, steps: this.state.steps +1, cords: grid[this.state.index -3] },  this.getY) :
-      null;
+      this.setState({ ...this.state, index: this.state.index -3, steps: this.state.steps +1, cords: grid[this.state.index -3], message: '' }, 
+       this.getY) :
+      this.setState({ ...this.state, message: `You can't go up`});
     }
     if (point === 'down') {
       this.state.index <= 5?
-      this.setState({ ...this.state, index: this.state.index +3, steps: this.state.steps +1, cords: grid[this.state.index +3] }, this.getY) :
-      null;
+      this.setState({ ...this.state, index: this.state.index +3, steps: this.state.steps +1, cords: grid[this.state.index +3], message: '' }, 
+      this.getY) :
+      this.setState({ ...this.state, message: `You can't go down`});
     }
   }
   onChange = (evt) => {
@@ -113,11 +117,24 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
+    const email = this.state.email;
+    if (email === ''){
+      this.setState({ ...this.state, message: `Ouch: email is required`})
+    }
+  
     evt.preventDefault()
     axios.post(URL, { "x": this.state.x, "y": this.state.y, "steps": this.state.steps, "email": this.state.email }
     )
-    .then(function (response) {
-      console.log(response);
+    .then( async res =>{
+      const expected = res.data.message
+      const delay = ms => new Promise(
+        resolve => setTimeout(resolve, ms)
+      );
+      this.reset()
+      await delay(500)
+      this.setState({ ...this.state, message: expected})
+      ;
+      
     })
     .catch(function (error) {
       console.log(error);
@@ -142,7 +159,7 @@ export default class AppClass extends React.Component {
           }
         </div>
         <div className="info">
-          <h3 id="message"></h3>
+          <h3 id="message">{this.state.message}</h3>
         </div>
         <div id="keypad">
           <button onClick={this.getNextIndex} id="left">LEFT</button>
@@ -153,7 +170,7 @@ export default class AppClass extends React.Component {
         </div>
         <form>
           <input onChange={this.onChange} id="email" type="email" placeholder="type email"></input>
-          <input onSubmit={this.onSubmit} id="submit" type="submit"></input>
+          <input onClick={this.onSubmit} id="submit" type="submit"></input>
         </form>
       </div>
     )
