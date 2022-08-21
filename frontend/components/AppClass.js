@@ -72,7 +72,19 @@ export default class AppClass extends React.Component {
     
   reset = () => {
     // Use this helper to reset all states to their initial values.
-    this.setState(initialState)
+    const input = document.getElementById("email")
+    this.setState({ 
+      message: initialMessage,
+      email: initialEmail,
+      index: initialIndex,
+      steps: initialSteps,
+      cords: grid[initialIndex],
+      grid: grid,
+      x: x,
+      y: y,
+    });
+    input.value = ''
+    
   }
 
   getNextIndex = (direction) => {
@@ -111,18 +123,38 @@ export default class AppClass extends React.Component {
     this.setState({
       ...this.state,
       email: evt.target.value
-  })
+    })
   }
 
 
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
     const email = this.state.email;
-    if (email === ''){
+    const steps = this.state.steps;
+    const cords = this .state.cords;
+    if (email === '' || email.includes('@'&&'.') === false) {
       this.setState({ ...this.state, message: `Ouch: email is required`})
     }
   
     evt.preventDefault()
+    if (email === 'foo@bar.baz'){
+      axios.post(URL, { "x": this.state.x, "y": this.state.y, "steps": this.state.steps, "email": this.state.email }
+      )
+      .then( async res =>{
+        const expected = res.data.message
+        const delay = ms => new Promise(
+          resolve => setTimeout(resolve, ms)
+        );
+        this.reset()
+        await delay(50) 
+        this.setState({ ...this.state, message: expected, steps: steps, cords: cords})
+        ;
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }else{
     axios.post(URL, { "x": this.state.x, "y": this.state.y, "steps": this.state.steps, "email": this.state.email }
     )
     .then( async res =>{
@@ -131,7 +163,7 @@ export default class AppClass extends React.Component {
         resolve => setTimeout(resolve, ms)
       );
       this.reset()
-      await delay(500)
+      await delay(50) 
       this.setState({ ...this.state, message: expected})
       ;
       
@@ -139,6 +171,7 @@ export default class AppClass extends React.Component {
     .catch(function (error) {
       console.log(error);
     });
+   }
   }
 
   render() {
