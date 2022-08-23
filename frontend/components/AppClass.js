@@ -86,7 +86,6 @@ export default class AppClass extends React.Component {
       y: y,
     });
     input.value = ''
-    
   }
 
   plural = () => {
