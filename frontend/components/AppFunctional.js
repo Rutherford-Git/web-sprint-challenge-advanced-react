@@ -160,10 +160,8 @@ export default function AppFunctional(props) {
   function move(direction) {
     const time = 'time';
     const times = 'times'
-    if (point.steps === 0){
-      getNextIndex(direction, time);
-    }
-    if (point.steps !== 0 && point.index !== 4){
+
+    if (point.steps === 0 && point.index === 4){
       getNextIndex(direction, time);
     }
     if (point.steps > 0){
