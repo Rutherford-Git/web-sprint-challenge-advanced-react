@@ -13,7 +13,7 @@ const grid = [
 ]
 const x = 2
 const y = 2
-const time = 'times'
+
 
 const initialState = {
   message: initialMessage,
@@ -34,60 +34,6 @@ export default function AppFunctional(props) {
   // You can delete them and build your own logic from scratch.
   const [point, setPoint] = useState(initialState)
   const [prop, setProp] = useState(props)
-
-  function plural() {
-    if (point.index === 1){
-        setPoint({
-          ...point,
-          time: 'time'
-        })    
-    }else{
-      setPoint({
-        ...point,
-        time: time
-    })
-  }
-}
-
-  function getX (){
-    const theIndex = point.index;
-    if (theIndex === 0 || theIndex === 1  || theIndex === 2 ){
-      setPoint({
-        ...point,
-         y: point.x = 1
-      }
-      ), plural()} 
-      if (theIndex === 3 || theIndex === 4  || theIndex === 5 ){
-        setPoint({
-          ...point,
-          y: point.x = 1
-        }
-        ), plural()} 
-        if (theIndex === 6 || theIndex === 7  || theIndex === 8 ){
-          setPoint({
-            ...point,
-            y: point.x = 1
-          }
-          ), plural()} 
-    }
-  function getY(){
-    const theIndex = point.index;
-    if (theIndex === 0 || theIndex === 3  || theIndex === 6 ){
-      setPoint({
-        ...point,
-        x: point.y = 1
-      }) , getX()} 
-      if (theIndex === 1 || theIndex === 4  || theIndex === 7 ){
-        setPoint({
-          ...point,
-          x: point.y = 1
-        }) , getX()} 
-        if (theIndex === 2 || theIndex === 5  || theIndex === 8 ){
-          setPoint({
-            ...point,
-            x: point.y = 1
-          }) , getX()}  
-    }
 
   function reset() {
     // Use this helper to reset all states to their initial values.
