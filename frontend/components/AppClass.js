@@ -7,10 +7,11 @@ const initialEmail = ''
 const initialSteps = 0
 const initialIndex = 4 // the index the "B" is at
 const grid = [
-  ["1,1"],["1,2"],["1,3"],["2,1"],["2,2"],["2,3"],["3,1"],["3,2"],["3,3"]
+  ["(1,1)"],["(2,1)"],["(3,1)"],["(1,2)"],["(2,2)"],["(3,2)"],["(1,3)"],["(2,3)"],["(3,3)"]
 ]
 const x = 2
 const y = 2
+const time = 'times'
 
 const initialState = {
   message: initialMessage,
@@ -21,6 +22,7 @@ const initialState = {
   grid: grid,
   x: x,
   y: y,
+  time: time
 }
 
 const URL = 'http://localhost:9000/api/result'
@@ -37,18 +39,18 @@ export default class AppClass extends React.Component {
     if (theIndex === 0 || theIndex === 1  || theIndex === 2 ){
       this.setState({
         ...this.state,
-        x: 1
-      })} 
+        y: 1
+      }, this.plural)} 
       if (theIndex === 3 || theIndex === 4  || theIndex === 5 ){
         this.setState({
           ...this.state,
-          x: 2
-        })} 
+          y: 2
+        }, this.plural)} 
         if (theIndex === 6 || theIndex === 7  || theIndex === 8 ){
           this.setState({
             ...this.state,
-            x: 3
-          })} 
+            y: 3
+          }, this.plural)} 
     }
 
   getY = () =>{
@@ -56,17 +58,17 @@ export default class AppClass extends React.Component {
     if (theIndex === 0 || theIndex === 3  || theIndex === 6 ){
       this.setState({
         ...this.state,
-        y: 1
+        x: 1
       }, this.getX)} 
       if (theIndex === 1 || theIndex === 4  || theIndex === 7 ){
         this.setState({
           ...this.state,
-          y: 2
+          x: 2
         }, this.getX)} 
         if (theIndex === 2 || theIndex === 5  || theIndex === 8 ){
           this.setState({
             ...this.state,
-            y: 3
+            x: 3
           }, this.getX)} 
     }
     
@@ -87,6 +89,19 @@ export default class AppClass extends React.Component {
     
   }
 
+  plural = () => {
+    if (this.state.index === 1){
+        this.setState({
+          ...this.state,
+          time: 'time'
+        })    
+    }else{
+      this.setState({
+        ...this.state,
+        time: time
+    })
+  }
+}
   getNextIndex = (direction) => {
     // This helper takes a direction ("left", "up", etc) and calculates what the next index
     // of the "B" would be. If the move is impossible because we are at the edge of the grid,
@@ -95,26 +110,39 @@ export default class AppClass extends React.Component {
     
     if (point === 'left') {
       this.state.index > 0 && this.state.index !== 3 && this.state.index !== 6?
-      this.setState({ ...this.state, index: this.state.index -1, steps: this.state.steps +1, cords: grid[this.state.index -1], message: '' }, 
-      this.getY) :
+      this.setState({ ...this.state, 
+        index: this.state.index -1, 
+        steps: this.state.steps +1, 
+        cords: grid[this.state.index -1], 
+        message: '' 
+      }, this.getY) :
       this.setState({ ...this.state, message: `You can't go left`})
     }
     if (point === 'right') {
       this.state.index < 8 && this.state.index !== 2 && this.state.index !== 5?
-      this.setState({ ...this.state, index: this.state.index +1, steps: this.state.steps +1, cords: grid[this.state.index +1 ], message: '' }, 
-      this.getY) :
+      this.setState({ ...this.state, 
+        index: this.state.index +1, 
+        steps: this.state.steps +1, 
+        cords: grid[this.state.index +1 ], 
+        message: '' }, this.getY) :
       this.setState({ ...this.state, message: `You can't go right`});
     }    
     if (point === 'up') {
       this.state.index >= 3?
-      this.setState({ ...this.state, index: this.state.index -3, steps: this.state.steps +1, cords: grid[this.state.index -3], message: '' }, 
-       this.getY) :
+      this.setState({ ...this.state, 
+        index: this.state.index -3, 
+        steps: this.state.steps +1, 
+        cords: grid[this.state.index -3], 
+        message: '' }, this.getY) :
       this.setState({ ...this.state, message: `You can't go up`});
     }
     if (point === 'down') {
       this.state.index <= 5?
-      this.setState({ ...this.state, index: this.state.index +3, steps: this.state.steps +1, cords: grid[this.state.index +3], message: '' }, 
-      this.getY) :
+      this.setState({ ...this.state, 
+        index: this.state.index +3, 
+        steps: this.state.steps +1, 
+        cords: grid[this.state.index +3], 
+        message: '' }, this.getY) :
       this.setState({ ...this.state, message: `You can't go down`});
     }
   }
@@ -129,49 +157,32 @@ export default class AppClass extends React.Component {
 
   onSubmit = (evt) => {
     // Use a POST request to send a payload to the server.
-    const email = this.state.email;
-    const steps = this.state.steps;
-    const cords = this .state.cords;
-    if (email === '' || email.includes('@'&&'.') === false) {
-      this.setState({ ...this.state, message: `Ouch: email is required`})
-    }
-  
     evt.preventDefault()
-    if (email === 'foo@bar.baz'){
-      axios.post(URL, { "x": this.state.x, "y": this.state.y, "steps": this.state.steps, "email": this.state.email }
-      )
-      .then( async res =>{
-        const expected = res.data.message
-        const delay = ms => new Promise(
-          resolve => setTimeout(resolve, ms)
-        );
-        this.reset()
-        await delay(50) 
-        this.setState({ ...this.state, message: expected, steps: steps, cords: cords})
-        ;
-        
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    }else{
-    axios.post(URL, { "x": this.state.x, "y": this.state.y, "steps": this.state.steps, "email": this.state.email }
+
+    axios.post(URL, { 
+      x: this.state.x, 
+      y: this.state.y, 
+      steps: this.state.steps, 
+      email: this.state.email 
+    }
     )
-    .then( async res =>{
+    .then( res =>{
       const expected = res.data.message
-      const delay = ms => new Promise(
-        resolve => setTimeout(resolve, ms)
-      );
-      this.reset()
-      await delay(50) 
-      this.setState({ ...this.state, message: expected})
-      ;
-      
+      console.log(res)
+      this.setState({ 
+        ...this.state, 
+        message: expected, 
+        email: "", 
+        index: this.state.index, 
+        cords: this.state.cords
+      })   
     })
-    .catch(function (error) {
-      console.log(error);
+    .catch((error) => {
+      this.setState({
+        ...this.state,
+        message: error.response.data.message
+      })
     });
-   }
   }
 
   render() {
@@ -179,8 +190,8 @@ export default class AppClass extends React.Component {
     return (
       <div id="wrapper" className={className}>
         <div className="info">
-          <h3 id="coordinates">Coordinates {this.state.cords}</h3>
-          <h3 id="steps">You moved {this.state.steps} times</h3>
+          <h3 id="coordinates">{this.state.cords}</h3>
+          <h3 id="steps">You moved {this.state.steps} {this.state.time}</h3>
         </div>
         <div id="grid">
           {
@@ -202,7 +213,7 @@ export default class AppClass extends React.Component {
           <button onClick={this.reset} id="reset">reset</button>
         </div>
         <form>
-          <input onChange={this.onChange} id="email" type="email" placeholder="type email"></input>
+          <input value={this.state.email} onChange={this.onChange} id="email" type="email" placeholder="type email"></input>
           <input onClick={this.onSubmit} id="submit" type="submit"></input>
         </form>
       </div>
